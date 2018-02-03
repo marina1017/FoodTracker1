@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         let stackView = MyStackView()
         stackView.axis = .vertical
         stackView.spacing = 10
-        stackView.alignment = .leading
+        stackView.alignment = .center
         stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.title = "てすとてすと"
@@ -24,6 +24,12 @@ class ViewController: UIViewController {
     }()
 
     //MARK: -lifecycle-
+    //1
+    override func loadView() {
+        super.loadView()
+        self.debugLog()
+    }
+    //2
     override func viewDidLoad() {
         super.viewDidLoad()
         self.myStackView.initLayout()
@@ -37,47 +43,79 @@ class ViewController: UIViewController {
             return singleTap
         }()
         self.myStackView.imageView.addGestureRecognizer(singleTap)
-
+        
+        self.debugLog()
 
     }
-
+    //3
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        self.debugLog()
+        Swift.print("viewWillAppear")
+        Swift.print(self.view.safeAreaInsets.top)
+        //SafeAreができたら制約をかける
+        self.constraints()
         
         
     }
-
+    
+    
+    override func viewSafeAreaInsetsDidChange() {
+        
+        self.debugLog()
+        Swift.print("viewSafeAreaInsetsDidChange")
+        Swift.print(self.view.safeAreaInsets.top)
+    }
+    
+    //制約の更新中に呼び出され、ビューコントローラがプロセスを調整できるようにします
+    //7 9
+    override func updateViewConstraints() {
+        super.updateViewConstraints()
+        
+        self.debugLog()
+        Swift.print("updateViewConstraints")
+        Swift.print(self.view.safeAreaInsets.top)
+    }
+    
+    //レイアウトされる前に実行される関数
+    //4 10 12
     override func viewWillLayoutSubviews() {
         //print(self.view.safeAreaInsets)
+        super.viewWillLayoutSubviews()
+        self.myStackView.layoutIfNeeded()
         
+        self.debugLog()
     }
-
+    
+    //レイアウトされた後に実行される関数
+    //8 11 13
     override func viewDidLayoutSubviews() {
         //print(self.view.safeAreaInsets)
-        print(self.view.layoutMarginsGuide.leadingAnchor)
-
-        //制約をかける
-        self.constraints()
-
-
+        
+        
+        super.viewDidLayoutSubviews()
+        self.debugLog()
     }
-
+    //15
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         //print(self.view.safeAreaInsets)
+        self.debugLog()
     }
 
     override func didReceiveMemoryWarning() {
         //メモリワーニングを受け取った直後に呼ばれるメソッド
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+        self.debugLog()
     }
+    
 
     func constraints() {
         //myStackViewの制約
-        self.myStackView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: self.view.safeAreaInsets.top + self.view.frame.height/10).isActive = true
-        self.myStackView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 10).isActive = true
-        self.myStackView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        self.myStackView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
+        self.myStackView.widthAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.widthAnchor, constant: 10).isActive = true
+        self.myStackView.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
     }
 
     @objc func selectImageFromPhotoLibrary(sender: UITapGestureRecognizer) {
@@ -91,11 +129,20 @@ class ViewController: UIViewController {
         self.present(imagePickerController, animated: true, completion: nil)
 
     }
-
     
-
-    @objc func setDefaultLabelText(_ sender: UIButton) {
-        self.myStackView.title = "触りました"
+    //デバッグ用のlogをとる
+    func debugLog( condition: @autoclosure () -> Bool = true, _ message: String = "", function: StaticString = #function, file: StaticString = #file, line: UInt = #line) {
+        
+        #if DEBUG
+            if let fileName = NSURL(string: String(describing: file))?.lastPathComponent {
+                Swift.print("function: \(function), file: \(fileName)")
+            } else {
+                Swift.print("function: \(function), file: \(file)")
+            }
+            
+            assert(condition, message, file: file, line: line)
+        #endif
+        
     }
 
 
@@ -117,4 +164,5 @@ extension ViewController: UITextFieldDelegate {
         self.myStackView.title = textField.text
     }
 }
+
 
