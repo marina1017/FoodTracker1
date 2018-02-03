@@ -12,9 +12,9 @@ class MyStackView: UIStackView {
 
     //MARK: -propties-
     lazy private var titleLabel: UILabel = self.createTitleLabel()
-    lazy private var buttom: UIButton = self.createButton()
     lazy var textFiled: UITextField = self.createTextField()
     lazy var imageView: UIImageView = self.createImageView()
+    lazy var ratingControllView: RatingControl = self.createRatingControllView()
 
     lazy var image: UIImage = UIImage(named:"Image")!
 
@@ -41,13 +41,28 @@ class MyStackView: UIStackView {
     private func commonInit() {
         self.addArrangedSubview(self.titleLabel)
         self.addArrangedSubview(self.textFiled)
-        self.addArrangedSubview(self.buttom)
         self.addArrangedSubview(self.imageView)
+        self.addArrangedSubview(self.ratingControllView)
+        
     }
+    
+    //LifeCycle
+    //6
+    override func updateConstraints() {
+        
+        
+        //これは最後に呼ぶ
+        super.updateConstraints()
+    }
+    
     //子ビューは必要に応じてこのメソッドをオーバーライドしてより正確なレイアウトを実行できる
     //子ビューの自動サイズ調整および制約ベースの動作が必要な動作を提供しない場合のみこのメソッドをオーバーライドする必要がある
+    //ここだったら親のviewがとれる
+    //8 10 14
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.layoutTitleLabel()
+        self.layoutTextFiled()
         self.layoutImageView()
     }
 
@@ -57,15 +72,6 @@ class MyStackView: UIStackView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         return label
-    }
-
-    private func createButton() -> UIButton {
-        let button = UIButton()
-        button.setTitle("スタックビューのボタン", for: .normal)
-        button.addTarget(getParentViewController(), action: #selector(ViewController.setDefaultLabelText(_:)), for: .touchUpInside)
-        button.setTitleColor(UIColor.blue, for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
     }
 
     private func createTextField() -> UITextField {
@@ -81,40 +87,45 @@ class MyStackView: UIStackView {
         return textFiled
     }
 
-    private func createImageView()-> UIImageView {
+    private func createImageView() -> UIImageView {
         let imageView = UIImageView()
         imageView.image = self.image
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.isUserInteractionEnabled = true
         return imageView
     }
+    
+    private func createRatingControllView() -> RatingControl {
+        let view = RatingControl()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.spacing = 8
+        return view
+    }
+    
 
     //MARK: layoutSubView
     func initLayout() {
-        self.layoutTitleLabel()
-        self.layoutButton()
-        self.layoutTextFiled()
+        
     }
   
     private func layoutTitleLabel() {
         self.titleLabel.sizeToFit()
-        self.titleLabel.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        //self.titleLabel.heightAnchor.constraint(equalToConstant: 30).isActive = true
     }
 
     private func layoutTextFiled() {
         self.textFiled.sizeToFit()
-        self.textFiled.heightAnchor.constraint(equalToConstant: 30).isActive = true
+//        self.textFiled.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        //self.textFiled.widthAnchor.constraint(equalToConstant: self.widthAnchor).isActive = true
+        self.imageView.widthAnchor.constraint(equalToConstant: self.frame.size.width*8/10).isActive = true
 
-    }
-
-    private func layoutButton() {
-        self.buttom.sizeToFit()
     }
 
     private func layoutImageView() {
-        self.imageView.widthAnchor.constraint(equalToConstant: self.frame.size.width).isActive = true
-        self.imageView.heightAnchor.constraint(equalToConstant: self.frame.size.width).isActive = true
+        self.imageView.widthAnchor.constraint(equalToConstant: self.frame.size.width*8/10).isActive = true
+        self.imageView.heightAnchor.constraint(equalToConstant: self.frame.size.width*8/10).isActive = true
     }
+
 }
 
 extension MyStackView {
